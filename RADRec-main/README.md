@@ -1,81 +1,43 @@
 # Not All Sequences Need Augmentation: Retrieval-Augmented Diffusion with Contrastive Learning for Sequential Recommendation (RADRec)
 
-PyTorch implementation of RADRec, packaged with the Beauty data and the
-checkpoints needed to reproduce evaluation and rebuild the sequence partition.
 
-## Package contents
+This is the Pytorch implementation for the paper.
 
-```text
-datasets/Beauty.txt             Beauty interaction sequences
-pretrained/beauty-0.pt          checkpoint used for sequence partitioning
-output/RADRec-Beauty.pt         supplied RADRec checkpoint
-output/entropy_cache/Beauty_cache.npz
-                                retained legacy partition cache
-scripts/eval.sh                 location-independent evaluation script
-tests/test_coupling_estimation.py
+
+## Implementation
+### Requirements
+```
+python>=3.9
+Pytorch >= 1.12.0
+torchvision==0.13.0
+torchaudio==0.12.0
+numpy==1.24.4
+scipy==1.6.0
+pandas==2.2.3
+```
+### Datasets
+Four public datasets are used in our experiments:
+
+- [Beauty](https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/All_Beauty_5.json.gz): the All Beauty subset from the Amazon Review Data (2018) collection.
+- [Sports](https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/Sports_and_Outdoors_5.json.gz): the Sports and Outdoors subset from the Amazon Review Data (2018) collection.
+- [Yelp](https://business.yelp.com/data/resources/open-dataset/): the Yelp Open Dataset for business recommendation and user review interactions.
+- [ML-1M](https://grouplens.org/datasets/movielens/1m/): the MovieLens 1M benchmark released by GroupLens.
+
+
+
+### Evaluate RADRec
+Here are the trained models for the Beauty datasets, stored in the `./output` folder. <br>
+You can evaluate a checkpoint in the `./output` folder directly on the test set by running the following command:
+
+```
+python main.py --data_name Beauty --eval_only --checkpoint_path ./output/RADRec-Beauty.pt
 ```
 
-Generated segmented datasets, new entropy caches, and log files are intentionally
-excluded and are recreated by the commands below. The retained `Beauty_cache.npz`
-comes from a legacy partition configuration; the current configuration rebuilds
-a compatible cache when needed.
+### Train RADRec
 
-## Requirements
-
-- Python 3.9 or newer
-- A PyTorch-compatible CPU or CUDA environment
-
-Install the Python dependencies with:
-
-```bash
-pip install -r requirements.txt
+```
+python main.py --data_name Beauty --model_idx 0 --build_entropy_cache_only --entropy_pretrained_path ./pretrained/beauty-0.pt
+python main.py --data_name Beauty --model_idx 0 --entropy_pretrained_path ./pretrained/beauty-0.pt
 ```
 
-## Build the Beauty partition cache
-
-Run this once before training:
-
-```bash
-python main.py \
-  --data_name Beauty \
-  --model_idx 0 \
-  --build_entropy_cache_only \
-  --entropy_pretrained_path ./pretrained/beauty-0.pt
-```
-
-The generated cache is stored under `output/entropy_cache/`.
-
-## Train RADRec
-
-```bash
-python main.py \
-  --data_name Beauty \
-  --model_idx 0 \
-  --entropy_pretrained_path ./pretrained/beauty-0.pt
-```
-
-Use `--cuda N` to select a CUDA device when needed.
-
-## Evaluate the supplied checkpoint
-
-From the repository root:
-
-```bash
-python main.py \
-  --data_name Beauty \
-  --eval_only \
-  --checkpoint_path ./output/RADRec-Beauty.pt
-```
-
-The helper script can be called from any directory and accepts additional
-arguments, for example `--cuda 1`:
-
-```bash
-./scripts/eval.sh --cuda 1
-```
-
-## Tests
-
-```bash
-python -m unittest -v tests.test_coupling_estimation
-```
+We will be releasing the complete code for the paper RADRec, so stay tuned!
